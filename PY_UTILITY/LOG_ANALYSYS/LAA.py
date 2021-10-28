@@ -138,13 +138,11 @@ def logAnalysis(txt):
     global total_product
     
     #Log Parsing & Analysis
-    completed = re.compile('''([,;]?510\d{9}(.*)?90\d[,;]?)|([,;]?90\d(.*)?510\d{9}[,;]?)|
-                               ([,;]?\d{3}[a-zA-Z](.*)?102\d{9,11}[,;]?)|
-                               ([,;]?102\d{9,11}(.*)?\d{3}[a-zA-Z][,;]?)''', re.VERBOSE)
+    completed = re.compile(#blind)
 
-    hanjinCode = re.compile('([,;]?510\d{9}(.*)?90\d[,;]?)|([,;]?90\d(.*)?510\d{9}[,;]?)')
-    campCode = re.compile('[,;]?\d{3}[a-zA-Z][,;]?')
-    InvoiceCode = re.compile('[,;]?102\d{9,11}[,;]?')
+    hanjinCode = re.compile(#blind)
+    campCode = re.compile(#blind)
+    InvoiceCode = re.compile(#blind)
     
     # if not str.startswith...
     # 1. Trigger ON!!! ...
