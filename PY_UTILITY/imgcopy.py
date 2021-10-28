@@ -81,8 +81,8 @@ def fileProcessing(pidList, day, middleName, dirName, fileName):
                 print(e)
 
 def noneImageProcessing(noneImgDict):
-    logFilePath = r'C:\Cognex\LMS\Log'
-    CB = ['BCR1', 'BCR4']
+    logFilePath = r'#blind'
+    CB = [#blind]
 
     for day in noneImgDict.keys():
         for area in noneImgDict[day]:
@@ -100,10 +100,10 @@ def noneImageProcessing(noneImgDict):
 
             for line in logContents:
                 if area in CB:
-                    pattObject = re.compile(r"D,2,(\d{8})")
+                    pattObject = re.compile(#blind)
 
                 else:
-                    pattObject = re.compile(r"D,(\d{6})")
+                    pattObject = re.compile(#blind)
 
                 cmpObject = pattObject.search(line)
                 if not cmpObject:
@@ -212,7 +212,7 @@ if not os.path.exists("D:\\"):
 else:
     drivePath = "D:\\"
     
-patt = re.compile(r"^#(\d+)#(\d+)")
+patt = re.compile(#blind)
 fileData = defaultdict(list)
 excelObject = load_workbook(excelPath)
 sheet = excelObject.active
@@ -277,8 +277,8 @@ else:
     os.mkdir(resultPath)
 
 
-dsk_address = os.path.join(os.path.expanduser('~'), 'Desktop')
-imgFolderList = [os.path.join(dsk_address, pp) for pp in ['BCR1-2', 'BCR4-2', 'W1-2', 'W2-2']]
+dsk_address = #blind
+imgFolderList = [os.path.join(dsk_address, pp) for pp in [#blind]
 print(imgFolderList)
 
 pidSet = set()
