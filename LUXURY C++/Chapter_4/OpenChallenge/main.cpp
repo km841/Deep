@@ -23,7 +23,15 @@ int main()
 	string startWord = wg.StartGame();
 	cout << startWord << endl;
 
-	while (wg.WordCompare()) {}
+	int turn = 0;
+	string word;
+
+	do
+	{
+		if (turn == n) turn = 0;
+		word = wg.Turn(turn++);
+
+	} while (wg.WordCompare(word));
 
 	cout << "게임이 끝났습니다!" << endl;
 }
