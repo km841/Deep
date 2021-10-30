@@ -1,6 +1,6 @@
 #include "WordGame.h"
 
-WordGame::WordGame(int n) : _turn(0)
+WordGame::WordGame(int n)
 {
 	srand(static_cast<unsigned int>(time(nullptr)));
 	this->_user = n;
@@ -32,20 +32,16 @@ string WordGame::Turn(int n)
 	return p.GetWord();
 }
 
-bool WordGame::WordCompare()
+bool WordGame::WordCompare(string word)
 {
-	if (_turn == _user) _turn = 0;
-
-	string curr = Turn(_turn++);
-
-	if (IsOverlaped(curr))
+	if (IsOverlaped(word))
 		return false;
 
-	if (_prev_word[_prev_word.size() - 2] == curr[0] &&
-		_prev_word[_prev_word.size() - 1] == curr[1])
+	if (_prev_word[_prev_word.size() - 2] == word[0] &&
+		_prev_word[_prev_word.size() - 1] == word[1])
 	{
-		_prev_words.emplace_back(curr);
-		_prev_word = curr;
+		_prev_words.emplace_back(word);
+		_prev_word = word;
 		return true;
 	}
 
@@ -76,3 +72,4 @@ WordGame::~WordGame()
 		_player = nullptr;
 	}
 }
+
