@@ -11,7 +11,6 @@ class WordGame
 private:
 	Player* _player;
 	int _user;
-	int _turn;
 
 	string _prev_word;
 	string _curr_word;
@@ -27,11 +26,13 @@ public:
 	void NameSetting();
 	Player& GetPlayer(int n);
 	string Turn(int n);
-	bool WordCompare();
+	bool WordCompare(string word);
 	bool IsOverlaped(const string& word);
 	string StartGame();
 
 
 	~WordGame();
 };
+
+
 
