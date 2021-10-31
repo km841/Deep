@@ -2,6 +2,7 @@
 
 GamblingGame::GamblingGame()
 {
+	srand(static_cast<unsigned int>(time(nullptr)));
 	_players = new Player[MAX_USER];
 }
 
