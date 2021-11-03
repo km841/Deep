@@ -2,7 +2,11 @@
 
 void Trace::put(string tag, string info)
 {
-	_traceVector.emplace_back(tag, info);
+	if (_traceVector.size() <= 100)
+		_traceVector.emplace_back(tag, info);
+
+	else
+		cout << "디버깅 정보가 가득 찼습니다!" << endl;
 }
 
 void Trace::print(string tag)
@@ -24,3 +28,4 @@ void Trace::print()
 	}
 
 }
+
