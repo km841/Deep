@@ -32,7 +32,7 @@ int main()
 			getline(cin, del);
 
 			auto it = v.begin();
-			while (it != v.end())
+			while (true)
 			{
 				if ((*it)->getName() == del)
 					it = v.erase(it);
