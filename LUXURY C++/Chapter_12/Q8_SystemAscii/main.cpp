@@ -18,7 +18,7 @@ int main()
 			else cout << setw(2) << setfill('0') << hex << (int)lines[i] << ' ';
 
 			if (i == 7) cout.put('\t');
-			if (i >= n && i == n) cout << '\t' << '\t';
+			if (i == n) cout << '\t' << '\t';
 			
 		}
 
