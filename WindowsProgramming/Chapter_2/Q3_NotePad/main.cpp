@@ -80,10 +80,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			colume--;
 			str[row][colume] = NULL;
 		}
-		else {
+
+		else if (row < 10){
 			str[row][colume++] = wParam;
 			str[row][colume] = NULL;
-			
 			
 		}
 		InvalidateRgn(hwnd, NULL, TRUE);
