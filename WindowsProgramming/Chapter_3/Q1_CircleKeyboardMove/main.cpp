@@ -70,6 +70,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		case VK_RIGHT: x += 20; break;
 		case VK_DOWN: y += 20; break;
 		case VK_LEFT: x -= 20; break;
+		case VK_HOME: x = 50; y = 50; break;
 		}
 		
 		if (x + 20 > rectView.right) x -= 20;
