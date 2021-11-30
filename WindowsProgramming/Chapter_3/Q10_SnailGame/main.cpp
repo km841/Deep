@@ -11,6 +11,35 @@ const int BSIZE = 20;
 std::random_device rd;
 std::mt19937 random(rd());
 
+struct Worm {
+	int x, y;
+	Worm(int x, int y) : x(x), y(y) {}
+};
+
+void alignWorm(std::vector<Worm>& v, int x, int y) {
+	int tempX, tempY;
+	int _tempX, _tempY;
+
+	tempX = v[0].x;
+	tempY = v[0].y;
+
+	v[0].x = x;
+	v[0].y = y;
+
+	for (int i = 1; i < v.size(); i++) {
+		if (v.size() >= 2) {
+			_tempX = v[i].x;
+			_tempY = v[i].y;
+			v[i].x = tempX;
+			v[i].y = tempY;
+			tempX = _tempX;
+			tempY = _tempY;
+		}
+
+		else break;
+	}
+}
+
 
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
@@ -62,21 +91,17 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 	HDC hdc;
 	PAINTSTRUCT ps;
 	static int x, y;
-	static int tailX, tailY;
 	static int dir;
-	static Bug* bug;
-	static Bug* currTail;
-
 	static Food* food[2];
-	
+
+	static std::vector<Worm> v;
+
 
 	static int overlapedX[3];
 	static int overlapedY[3];
 	static int foodCount;
 
 	static BOOL timerFlag;
-
-	int bugCount;
 
 	static RECT outLine;
 	HPEN hPen, tailPen, oldPen;
@@ -86,14 +111,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 	switch (iMsg) {
 	case WM_CREATE:
 		GetClientRect(hwnd, &outLine);
-		
+
 		x = 100; y = 60;
-		bugCount = 1;
-		bug = new Bug(x, y);
-		currTail = bug;
-		bug->setDir(RIGHT);
-		
-		foodCount = 0;
+		v.emplace_back(x, y);
+
 		timerFlag = FALSE;
 		overlapedX[foodCount] = x;
 		overlapedY[foodCount] = y;
@@ -146,38 +167,29 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 
 
 	case WM_TIMER:
-		
-		bug->bugMove(dir, outLine);
-
-		static Bug* isCurrTail;
-		static Bug* prevTail;
-		prevTail = bug;
-		isCurrTail = bug->getTail();
-		while (prevTail->isTail()) {
-			isCurrTail->setPrevX(isCurrTail->getX());
-			isCurrTail->setPrevY(isCurrTail->getY());
-
-			isCurrTail->setX(prevTail->getPrevX());
-			isCurrTail->setY(prevTail->getPrevY());
-
-			isCurrTail->tailPos(isCurrTail->getPrevX(), isCurrTail->getPrevY());
-
-			prevTail = isCurrTail;
-			isCurrTail = isCurrTail->getTail();
-		}
-		
 
 		for (int i = 0; i < 2; i++) {
-			if (bug->isEat(food[i]->getX(), food[i]->getY())) {
-				food[i]->setX(outLine.right + 40);
-				food[i]->setY(outLine.bottom + 40);
-				
-				currTail->addTail();
-				currTail = currTail->getTail();
+			if (abs(v.front().x - food[i]->getX()) < 40 && abs(v.front().y - food[i]->getY()) < 40) {
+				std::uniform_int_distribution<> random_width(80, outLine.right - 80);
+				std::uniform_int_distribution<> random_height(80, outLine.bottom - 80);
+
+				food[i]->setX(random_width(random));
+				food[i]->setY(random_height(random));
+
+				v.emplace_back(v.back().x, v.back().y);
 				break;
 			}
 		}
 		
+		switch (dir) {
+		case UP: y = v.front().y - 40; break;
+		case RIGHT: x = v.front().x + 40; break;
+		case DOWN: y = v.front().y + 40; break;
+		case LEFT: x = v.front().x - 40; break;
+		}
+
+		alignWorm(v, x, y);
+
 
 		InvalidateRgn(hwnd, NULL, TRUE);
 		break;
@@ -195,26 +207,27 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			Rectangle(hdc, outLine.right - 55, i - BSIZE, outLine.right - 15, i + BSIZE);
 		}
 
-		Bug* curr;
-		curr = bug;
 
 		hPen = CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
 		oldPen = (HPEN)SelectObject(hdc, hPen);
-		Ellipse(hdc, curr->getX() - BSIZE, curr->getY() - BSIZE, curr->getX() + BSIZE, curr->getY() + BSIZE);
-		curr = curr->getTail();
+
+		Ellipse(hdc, v.front().x - BSIZE, v.front().y - BSIZE, v.front().x + BSIZE, v.front().y + BSIZE);
+
 		SelectObject(hdc, hPen);
 		DeleteObject(hPen);
 
 		tailPen = CreatePen(PS_SOLID, 1, RGB(0, 0, 255));
 		oldPen = (HPEN)SelectObject(hdc, tailPen);
-		while (curr) {
-			Ellipse(hdc, curr->getX() - BSIZE, curr->getY() - BSIZE, curr->getX() + BSIZE, curr->getY() + BSIZE);
-			curr = curr->getTail();
-		}
+
+		if (v.size() >= 2)
+			for (int i = 1; i < v.size(); i++)
+				Ellipse(hdc, v[i].x - BSIZE, v[i].y - BSIZE, v[i].x + BSIZE, v[i].y + BSIZE);
+		
+
 		SelectObject(hdc, oldPen);
 		DeleteObject(tailPen);
 
-		
+
 
 		for (int i = 0; i < 2; i++) {
 			hBrush = CreateSolidBrush(RGB(255, 0, 0));
@@ -225,19 +238,11 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			DeleteObject(hBrush);
 		}
 
-		
+
 		EndPaint(hwnd, &ps);
 		break;
 
 	case WM_DESTROY:
-
-		Bug* delBug = bug->getTail();
-
-		while (delBug != nullptr) {
-			delete bug;
-			bug = delBug;
-			delBug = bug->getTail();
-		}
 
 		for (int i = 0; i < 2; i++) {
 			if (food[i] != nullptr) {
