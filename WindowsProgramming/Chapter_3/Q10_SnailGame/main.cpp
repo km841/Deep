@@ -1,4 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
+#pragma warning(disable: 28251)
+#pragma warning(disable: 4018)
 #include <Windows.h>
 #include <iostream>
 #include <vector>
@@ -43,7 +45,7 @@ void alignWorm(std::vector<Worm>& v, int x, int y) {
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrev, LPSTR lpszCmdLine, int nCmdShow)
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int nCmdShow)
 {
 	HWND hwnd;
 	MSG msg;
