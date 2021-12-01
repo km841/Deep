@@ -86,6 +86,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		pos->x = LOWORD(lParam);
 		pos->y = HIWORD(lParam);
 
+		if (curr != nullptr) {
+			delete curr;
+		}
 		curr = CoordToIndex(pos);
 		if (curr->x > 8 || curr->y > 4) break;
 		else {
