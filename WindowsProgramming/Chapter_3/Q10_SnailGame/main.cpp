@@ -4,7 +4,6 @@
 #include <vector>
 #include <tchar.h>
 #include <random>
-#include "Bug.h"
 #include "Food.h"
 
 const int BSIZE = 20;
@@ -102,10 +101,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 	static int foodCount;
 
 	static BOOL timerFlag;
+	static BOOL deadFlag;
 
 	static RECT outLine;
 	HPEN hPen, tailPen, oldPen;
 	HBRUSH hBrush, oldBrush;
+
+	static TCHAR buf[1024];
 
 
 	switch (iMsg) {
@@ -116,6 +118,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		v.emplace_back(x, y);
 
 		timerFlag = FALSE;
+		deadFlag = FALSE;
 		overlapedX[foodCount] = x;
 		overlapedY[foodCount] = y;
 		foodCount++;
@@ -161,7 +164,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 
 
 		timerFlag = TRUE;
-		SetTimer(hwnd, 1, 200, NULL);
+		SetTimer(hwnd, 1, 200 - v.size() * 5, NULL);
 
 		break;
 
@@ -207,35 +210,56 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			Rectangle(hdc, outLine.right - 55, i - BSIZE, outLine.right - 15, i + BSIZE);
 		}
 
+		if (!deadFlag) {
+			hPen = CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
+			oldPen = (HPEN)SelectObject(hdc, hPen);
 
-		hPen = CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
-		oldPen = (HPEN)SelectObject(hdc, hPen);
+			Ellipse(hdc, v.front().x - BSIZE, v.front().y - BSIZE, v.front().x + BSIZE, v.front().y + BSIZE);
 
-		Ellipse(hdc, v.front().x - BSIZE, v.front().y - BSIZE, v.front().x + BSIZE, v.front().y + BSIZE);
+			SelectObject(hdc, hPen);
+			DeleteObject(hPen);
 
-		SelectObject(hdc, hPen);
-		DeleteObject(hPen);
+			tailPen = CreatePen(PS_SOLID, 1, RGB(0, 0, 255));
+			oldPen = (HPEN)SelectObject(hdc, tailPen);
 
-		tailPen = CreatePen(PS_SOLID, 1, RGB(0, 0, 255));
-		oldPen = (HPEN)SelectObject(hdc, tailPen);
-
-		if (v.size() >= 2)
-			for (int i = 1; i < v.size(); i++)
-				Ellipse(hdc, v[i].x - BSIZE, v[i].y - BSIZE, v[i].x + BSIZE, v[i].y + BSIZE);
-		
-
-		SelectObject(hdc, oldPen);
-		DeleteObject(tailPen);
+			if (v.size() >= 2)
+				for (int i = 1; i < v.size(); i++)
+					Ellipse(hdc, v[i].x - BSIZE, v[i].y - BSIZE, v[i].x + BSIZE, v[i].y + BSIZE);
 
 
+			SelectObject(hdc, oldPen);
+			DeleteObject(tailPen);
 
-		for (int i = 0; i < 2; i++) {
-			hBrush = CreateSolidBrush(RGB(255, 0, 0));
-			oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
-			Rectangle(hdc, food[i]->getX() - 20, food[i]->getY() - 20, food[i]->getX() + 20, food[i]->getY() + 20);
 
-			SelectObject(hdc, oldBrush);
-			DeleteObject(hBrush);
+
+			for (int i = 0; i < 2; i++) {
+				hBrush = CreateSolidBrush(RGB(255, 0, 0));
+				oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
+				Rectangle(hdc, food[i]->getX() - 20, food[i]->getY() - 20, food[i]->getX() + 20, food[i]->getY() + 20);
+
+				SelectObject(hdc, oldBrush);
+				DeleteObject(hBrush);
+			}
+		}
+
+		for (int i = 0; i < v.size(); i++) {
+			if (i == 0) continue;
+			if ((v.front().x == v[i].x) && (v.front().y == v[i].y)) {
+				deadFlag = TRUE;
+				break;
+			}
+		}
+
+		if ((v.front().x <= 40) || (v.front().x >= outLine.right - 40)
+			|| (v.front().y <= 40) || v.front().y >= outLine.bottom - 40) {
+			deadFlag = TRUE;
+		}
+
+		if (deadFlag) {
+			_stprintf(buf, _T("당신의 점수는 %d점 입니다."), v.size());
+
+			TextOut(hdc, outLine.right / 2 - 100, outLine.bottom / 2, buf, _tcslen(buf));
+			KillTimer(hwnd, 1);
 		}
 
 
