@@ -196,6 +196,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 
 
 	case WM_DESTROY:
+		HideCaret(hwnd);
+		DestroyCaret();
 		PostQuitMessage(0);
 		break;
 	}
