@@ -5,6 +5,7 @@
 #include <string>
 #include <tchar.h>
 #include <locale>
+#include <map>
 #include "resource.h"
 
 enum {
@@ -74,6 +75,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 	static int startX, startY;
 	static int beforeX, beforeY;
 
+	static std::map<int, int> m;
+
 	static int tool;
 	static int prevTool;
 	static BOOL clicked;
@@ -81,6 +84,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 
 	static CHOOSECOLOR color;
 	CHOOSEFONT font;
+	static COLORREF fontColor;
+	HFONT hFont, oldFont;
+	static LOGFONT logFont;
 
 	static COLORREF fColor, sColor, tmp[16];
 	static HBRUSH hBrush, oldBrush;
@@ -93,11 +99,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 	static int selection;
 	static int paintCnt;
 
-	static TCHAR boxString[20][1024];
+	static TCHAR boxString[100][1024];
 	static int word;
 	static int boxCnt;
+	static int boxList[100];
 	
-	static RECT rect[20];
+	static RECT rect[100];
 	static int prev;
 
 
@@ -251,6 +258,19 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 
 			break;
 
+			
+		case ID_FONTDLG:
+			memset(&font, 0, sizeof(CHOOSEFONT));
+			font.lStructSize = sizeof(CHOOSEFONT);
+			font.hwndOwner = hwnd;
+			font.lpLogFont = &logFont;
+			font.Flags = CF_EFFECTS | CF_SCREENFONTS;
+			if (ChooseFont(&font) != 0) {
+				fontColor = font.rgbColors;
+				InvalidateRect(hwnd, NULL, TRUE);
+			}
+			break;
+
 		
 		}
 		InvalidateRgn(hwnd, NULL, TRUE);
@@ -297,7 +317,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			colorNums[paintCnt++] = sColor;
 		}
 		else if (tool == 4) {
-			boxCnt++;
+			m[paintCnt] = boxCnt++;
 			word = 0;
 			colorNums[paintCnt++] = RGB(0, 0, 0);
 			
@@ -354,20 +374,28 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			}
 
 			else if (shapeTypes[i] == 4) {
+
+				int realValue = m[i];
+
+				hFont = CreateFontIndirect(&logFont);
+				oldFont = (HFONT)SelectObject(hdc, hFont);
+				SetTextColor(hdc, fontColor);
 				
-				rect[i].left = spaintX[i];
-				rect[i].top = spaintY[i];
-				rect[i].right = epaintX[i];
-				rect[i].bottom = epaintY[i];
+				rect[realValue].left = spaintX[i];
+				rect[realValue].top = spaintY[i];
+				rect[realValue].right = epaintX[i];
+				rect[realValue].bottom = epaintY[i];
 
 				hBrush = CreateSolidBrush(colorNums[i]);
 				oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
 				Rectangle(hdc, spaintX[i], spaintY[i], epaintX[i], epaintY[i]);
 				//rect[j] = { spaintX[i], spaintY[i], epaintX[i], epaintY[i] };
 
-				DrawText(hdc, boxString[i], _tcslen(boxString[i]), &rect[i], DT_TOP | DT_WORDBREAK | DT_EDITCONTROL);
+				DrawText(hdc, boxString[realValue], _tcslen(boxString[realValue]), &rect[realValue], DT_TOP | DT_WORDBREAK | DT_EDITCONTROL);
 
 				SelectObject(hdc, oldBrush);
+				SelectObject(hdc, oldFont);
+				DeleteObject(hFont);
 				DeleteObject(hBrush);
 			
 			}
