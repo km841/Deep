@@ -77,7 +77,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		for (int i = 0; i < rect.right / (rect.right / div); i++) {
 			for (int j = 0; j < rect.bottom / (rect.bottom / div); j++) {
 				StretchBlt(hdc, (rect.right / div) * i, (rect.bottom / div) * j, rect.right / div, rect.bottom / div,
-					memdc, (819 / div) * ((rect.right / (rect.right / div)) - i - 1), (614 / div) * ((rect.bottom / (rect.bottom / div)) - j - 1), 819 / div, 614 / div, SRCCOPY);
+					memdc, (819 / div) * ((rect.right / (rect.right / div)) - i - 1), (614 / div) * ((rect.bottom / (rect.bottom / div)) - j - 1), 
+					819 / div, 614 / div, SRCCOPY);
 			}
 
 		}
