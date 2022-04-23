@@ -42,11 +42,6 @@ int main()
     int a, b;
     char op;
 
-    OP::Plus<int> f_plus;
-    OP::Minus<int> f_minus;
-    OP::Multifly<int> f_multiply;
-    OP::Divide<int> f_divide;
-
     std::cout << "두 수를 공백으로 구분해서 입력하세요" << std::endl << ">>>";
     std::cin >> a >> b;
     
@@ -56,19 +51,19 @@ int main()
     switch (op)
     {
     case '+':
-        std::cout << "답 : " << Operator(a, b, f_plus) << std::endl;
+        std::cout << "답 : " << Operator(a, b, OP::Plus<int>()) << std::endl;
         break;
 
     case '-':
-        std::cout << "답 : " << Operator(a, b, f_minus) << std::endl;
+        std::cout << "답 : " << Operator(a, b, OP::Minus<int>()) << std::endl;
         break;
 
     case '*':
-        std::cout << "답 : " << Operator(a, b, f_multiply) << std::endl;
+        std::cout << "답 : " << Operator(a, b, OP::Multifly<int>()) << std::endl;
         break;
 
     case '/':
-        std::cout << "답 : " << Operator(a, b, f_divide) << std::endl;
+        std::cout << "답 : " << Operator(a, b, OP::Divide<int>()) << std::endl;
         break;
     }
 }
