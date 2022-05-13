@@ -231,7 +231,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		g_hWndControl = sheet.get()->GetHwndTotalList();
 
 		hStatic = CreateWindowEx(
-			0, _T("static"), _T("문의 : hmkim@jssystems.co.kr"), WS_CHILD | WS_VISIBLE | ES_LEFT,
+			0, _T("static"), _T("문의 : "), WS_CHILD | WS_VISIBLE | ES_LEFT,
 			rect.right - 260, rect.bottom - 30, 300, 30, hwnd, 0, g_hInst, 0);
 
 		SendMessage(hStatic, WM_SETFONT, (WPARAM)hEmailFont, 0);
